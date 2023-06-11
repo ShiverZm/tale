@@ -1,0 +1,149 @@
+#include('../partial/header.html', {title: '图片在线处理'})
+<link href="${theme_url('/static/plugins/dropzone/4.3.0/min/dropzone.min.css')}" rel="stylesheet">
+<link href="${theme_url('/static/plugins/bootstrap/3.3.7/css/bootstrap.min.css')}" rel="stylesheet" />
+<link href="${theme_url('/static/plugins/font-awesome/4.7.0/css/font-awesome.min.css')}" rel="stylesheet">
+<link href="${theme_url('/static/plugins/limonte-sweetalert2/6.4.1/sweetalert2.min.css')}" rel="stylesheet">
+<link href="${theme_url('/static/plugins/vue-loading/vue-loading.min.css')}" rel="stylesheet">
+<!--<link href="${theme_url('/static/css/style.min.css?v=${version}')}" rel="stylesheet" >-->
+<link rel="stylesheet" href="https://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css" crossorigin="anonymous">
+<link rel="stylesheet" href="${theme_url('/static/css/image-proc.css')}">
+<div class="container">
+	<h3>图片在线处理</h3>
+	<hr>
+	<div id="app" v-cloak>
+		<div class="row">
+			<div class="col-lg-12 mb-4">
+				<div class="card">
+					<h4 class="card-header">处理选项</h4>
+					<div class="card-body">
+						<div class="form-check">
+							<input type="radio" name="inlineRadioOptions" value="option2" /> 灰度图
+						</div>
+						<div class="form-check">
+							<input type="radio" name="inlineRadioOptions" value="option2" /> 点阵图
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12 mb-4">
+				<div class="card col-lg-4 mb-4" @change="change" @dragover="dragover" @drop="drop">
+
+					<div class="card-body">
+						<div class="p-5 text-center">拖拽上传 <label class="text-primary">浏览... <input type="file" class="sr-only" id="file" accept="image/*" ref="input"></label></div>
+					</div>
+				</div>
+				<div class="col-lg-8 mb-4">
+				<div class="card mb-4">
+					<h5 class="card-header d-flex align-items-center justify-content-between">
+						<span>处理前图片 <small class="text-secondary">(original image)</small></span>
+						<a class="btn btn-sm btn-blocks btn-outline-primary" :download="input.name" :href="inputURL" title="Download the processed image">Download</a>
+					</h5>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-md-4 d-flex mb-3">
+								<div class="w-100 text-center" v-if="inputURL">
+									<img class="mw-100" :src="inputURL" :alt="input.name">
+<!--										<img class="mw-100" src="http://127.0.0.1:9000/templates/themes/Kratos/static/images/picture.jpg">-->
+
+								</div>
+								<div v-else class="w-100 bg-light"></div>
+							</div>
+							<div class="col-md-8">
+								<dl class="row">
+									<dt class="col-5">lastModified:</dt>
+									<dd class="col-7">{{ input.lastModified || 'N/A' }}</dd>
+									<dt class="col-5">lastModifiedDate:</dt>
+									<dd class="col-7">{{ input.lastModifiedDate || 'N/A' }}</dd>
+									<dt class="col-5">name:</dt>
+									<dd class="col-7">{{ input.name || 'N/A' }}</dd>
+									<dt class="col-5">type:</dt>
+									<dd class="col-7">{{ input.type || 'N/A' }}</dd>
+									<dt class="col-5">size:</dt>
+									<dd class="col-7">{{ input.size | prettySize }}</dd>
+								</dl>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card">
+					<h5 class="card-header d-flex align-items-center justify-content-between">
+						<span>处理后图片 <small class="text-secondary">(processed image)</small></span>
+						<a class="btn btn-sm btn-blocks btn-outline-primary" :download="output.name" :href="outputURL" title="Download the processed image">Download</a>
+					</h5>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-md-4 d-flex mb-3">
+								<div class="w-100 text-center" v-if="outputURL">
+									<img class="mw-100" :src="outputURL" :alt="output.name">
+								</div>
+								<div v-else class="w-100 bg-light"></div>
+							</div>
+							<div class="col-md-8">
+								<dl class="row">
+									<dt class="col-5">lastModified:</dt>
+									<dd class="col-7">{{ output.lastModified || 'N/A' }}</dd>
+									<dt class="col-5">lastModifiedDate:</dt>
+									<dd class="col-7">{{ output.lastModifiedDate || 'N/A' }}</dd>
+									<dt class="col-5">name:</dt>
+									<dd class="col-7">{{ output.name || 'N/A' }}</dd>
+									<dt class="col-5">type:</dt>
+									<dd class="col-7">{{ output.type || 'N/A' }}</dd>
+									<dt class="col-5">size:</dt>
+									<dd class="col-7">{{ output.size | prettySize }}
+										<span v-if="output.size">({{ ((1 - (output.size / input.size)) * 100).toFixed(2) }}% off)</span>
+									</dd>
+								</dl>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+#include('../partial/footer.html')
+<script src="${theme_url('/static/plugins/bootstrap/3.3.7/js/bootstrap.min.js')}"></script>
+<script src="${theme_url('/static/plugins/dropzone/4.3.0/min/dropzone.min.js')}"></script>
+<script src="${theme_url('/static/plugins/clipboard.js/1.6.0/clipboard.min.js')}"></script>
+<script src="${theme_url('/static/plugins/vue/vue.min.js')}"></script>
+<script src="${theme_url('/static/plugins/vue-loading/vue-loading.min.js')}"></script>
+<script src="${theme_url('/static/plugins/axios/axios.min.js')}"></script>
+<script src="${theme_url('/static/plugins/compressorjs/compressor.min.js')}"></script>
+<script src="${theme_url('/static/js/image-proc.js')}"></script>
+<script >
+	document.getElementById('file').addEventListener('change', (e) => {
+		const file = e.target.files[0];
+
+		if (!file) {
+			return;
+		}
+
+		new Compressor(file, {
+			quality: 0.6,
+
+			// The compression process is asynchronous,
+			// which means you have to access the `result` in the `success` hook function.
+			success(result) {
+				const formData = new FormData();
+
+				// The third parameter is required for server
+				formData.append('file', result, result.name);
+				alert("1")
+				// Send the compressed image file to server with XMLHttpRequest.
+				axios.post('/path/to/upload', formData).then(() => {
+					console.log('Upload success');
+				});
+			},
+			error(err) {
+				console.log(err.message);
+			},
+		});
+
+	});
+</script>
+</body>
+</html>

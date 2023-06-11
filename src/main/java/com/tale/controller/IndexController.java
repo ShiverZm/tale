@@ -7,6 +7,7 @@ import com.blade.mvc.http.Request;
 import com.blade.mvc.http.Response;
 import com.blade.mvc.http.Session;
 import com.tale.bootstrap.TaleConst;
+import com.tale.extension.AdminCommons;
 import com.tale.model.dto.Archive;
 import com.tale.model.dto.Types;
 import com.tale.model.entity.Contents;
@@ -113,6 +114,28 @@ public class IndexController extends BaseController {
         request.attribute("archives", archives);
         request.attribute("is_archive", true);
         return this.render("archives");
+    }
+
+    /**
+     * 图片处理页
+     *
+     * @return
+     */
+    @GetRoute(value = {"toolkit/image_proc", "toolkit/image_proc.html"})
+    public String image_proc(Request request) {
+        request.attribute("cdnURL", AdminCommons.cdnURL());
+        return this.render("toolkit/image_proc");
+    }
+
+    /**
+     * 图片压缩页
+     *
+     * @return
+     */
+    @GetRoute(value = {"toolkit/image_compress", "toolkit/image_compress.html"})
+    public String image_compress(Request request) {
+        request.attribute("cdnURL", AdminCommons.cdnURL());
+        return this.render("toolkit/image_compress");
     }
 
     /**
